@@ -8,7 +8,19 @@ This will eventually used as a part of a complete project.
 Usage:
 ---------------------
 
-Compile the application with Visual Studio 2010. To change the running program, one currently needs to edit the source.
+Download the latest version or compile the application with Visual Studio 2010. To change the running program, one currently needs to edit the source.
+
+Commands:
+---------------------
+
+- none (press enter)
+	Executes the next instruction
+- printmem [location]
+	Displays the memory contents, either at the program counter or at an optional parameter
+- printreg
+	Shows the contents of all registers
+- quit
+	Ends the simulation
 
 MutableVM Instruction Documentation:
 ---------------------
@@ -78,20 +90,33 @@ Memory Addressable from 0 to 8191 (2^13-1)
 
 ######Instruction Types:
 
-- 00 = load
-- 01 = store
-- 02 = add
-- 03 = subtract
-- 04 = multiply
-- 05 = divide
-- 06 = rem
-- 07 = jump
-- 08 = set register to constant
-- 09 = no operation
+- 00
+	load
+- 01
+	store
+- 02
+	add
+- 03
+	subtract
+- 04
+	multiply
+- 05
+	divide
+- 06
+	rem
+- 07
+	jump
+- 08
+	set register to constant
+- 09
+	no operation
 
 
 Version History:
 ---------------------
+
+### Version 0.02 ([Download] (https://github.com/downloads/overlordnyaldee/NyaldeeMutableVM/MutableVM-0.02.zip))
+- Updated the instruction set, added additional registers, added commands to print registers/memory
 
 ### Version 0.01
 - Initial version, successfully runs a program to calculate the Fibonacci sequence.
