@@ -7,40 +7,8 @@ namespace MutableVM
 
     class Program
     {
-
-
-
         static void Main(string[] args)
         {
-
-            // 0 1 2000 3000
-            // | | |
-            // | | Memory address
-            // | Register to use
-            // Type of instruction
-
-            // 0 = load
-            // 1 = store
-            // 2 = add
-            // 3 = subtract
-            // 4 = multiply
-            // 5 = divide
-            // 6 = rem
-            // 7 = jump-if-zero
-            // 8 = jump-if equal
-            // 9 = set register to constant
-
-            // registers:
-            // 0 1 2 3
-
-            // Memory:
-            // 0000
-            // 4 digits. Addressable from 0 to 8192.
-
-            // Constant:
-            // 0000
-
-            List<int> c = new List<int>(4);
 
             Machine m = new Machine();
 
@@ -79,12 +47,17 @@ namespace MutableVM
             Console.WriteLine(m.printMemory());
             Console.WriteLine(m.printRegisters());
 
+            // Internal instruction representation
+            List<int> CurrentInstruction = new List<int>(4);
+
+            // Main execution loop
             while (true)
             {
 
+                // Read input from console, split based on spaces
                 String[] input = Console.ReadLine().Split(' ');
 
-
+                // Manage commands
                 if (input[0].Equals("printmem"))
                 {
                     if (input.Length > 1)
@@ -113,11 +86,14 @@ namespace MutableVM
                     break;
                 }
 
+                // Retreive next instruction
                 Int64 instruction = m.getMemoryAtLocation((int)m.getRegister((int)Machine.RegisterEnum.PC));
                 Console.WriteLine("instruction: " + instruction.ToString("0000000000000"));
+
+                // Attempt to parse raw string into internal instruction format
                 try
                 {
-                    c = parseInstructionFromInteger(instruction);
+                    CurrentInstruction = parseInstructionFromInteger(instruction);
                 }
                 catch (Exception e)
                 {
@@ -125,12 +101,13 @@ namespace MutableVM
                     break;
                 }
                 
+                // Rename for readability
+                type = CurrentInstruction[0];
+                register = CurrentInstruction[1];
+                memory = CurrentInstruction[2];
+                constant = CurrentInstruction[3];
 
-                type = c[0];
-                register = c[1];
-                memory = c[2];
-                constant = c[3];
-
+                // Primary instruction switch
                 switch (type)
                 {
                     case 0: // Load
@@ -226,7 +203,6 @@ namespace MutableVM
             c.Add(Convert.ToInt32(a.Substring(1, 4)));
             c.Add(Convert.ToInt32(a.Substring(5, 4)));
             c.Add(Convert.ToInt32(a.Substring(9)));
-            
 
             return c;
         }
@@ -239,166 +215,169 @@ namespace MutableVM
         }
     }
 
+    
+    /// <summary>
+    /// Machine class that manages the overall machine
+    /// </summary>
     class Machine
     {
-        public const int MemorySize = 8192;
-
-        private Int64 RegisterA;
-        private Int64 RegisterB;
-        private Int64 RegisterC;
-        private Int64 RegisterD;
-        private Int64 RegisterE;
-        private Int64 RegisterF;
-        private Int64 RegisterPC;
 
         public enum RegisterEnum {A, B, C, D, E, F, PC};
 
-        int[] Registers = new int[5] { 1, 2, 3, 4, 5 };
+        Register[] registers = new Register[7] { new Register(), new Register(), 
+            new Register(), new Register(), new Register(), new Register(), new Register() };
 
-        private List<Int64> Memory;
+        Memory Memory = new Memory();
 
         public Machine()
         {
             clearAllRegisters();
-            Memory = new List<Int64>(MemorySize);
             clearMemory();
         }
 
-        public Int64 getRegister(int register)
+        public Int64 getRegister(RegisterEnum index)
         {
-            RegisterEnum e = (RegisterEnum)register;
-            switch (e)
-            {
-                case RegisterEnum.A:
-                    return RegisterA;
-                case RegisterEnum.B:
-                    return RegisterB;
-                case RegisterEnum.C:
-                    return RegisterC;
-                case RegisterEnum.D:
-                    return RegisterD;
-                case RegisterEnum.E:
-                    return RegisterE;
-                case RegisterEnum.F:
-                    return RegisterF;
-                case RegisterEnum.PC:
-                    return RegisterPC;
-                default:
-                    throw new ArgumentException();
-            }
+            return registers[(int)index].register;
         }
 
-        public void setRegister(int register, Int64 data)
+        public Int64 getRegister(int index)
         {
-            switch (register)
-            {
-                case 0:
-                    RegisterA = data;
-                    break;
-                case 1:
-                    RegisterB = data;
-                    break;
-                case 2:
-                    RegisterC = data;
-                    break;
-                case 3:
-                    RegisterD = data;
-                    break;
-                case 4:
-                    RegisterE = data;
-                    break;
-                case 5:
-                    RegisterF = data;
-                    break;
-                case 6:
-                    RegisterPC = data;
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
+            RegisterEnum e = (RegisterEnum)index;
+            return getRegister(e);
+        }
+
+        public void setRegister(RegisterEnum index, Int64 data)
+        {
+            registers[(int)index].register = data;
+        }
+
+        public void setRegister(int index, Int64 data)
+        {
+            RegisterEnum e = (RegisterEnum)index;
+            setRegister(e, data);
         }
 
         public String printRegisters()
         {
             StringBuilder sb = new StringBuilder(12);
+
             sb.Append("PC: ");
-            sb.Append(RegisterPC.ToString(""));
-            sb.Append(" A: ");
-            sb.Append(RegisterA.ToString(""));
-            sb.Append(" B: ");
-            sb.Append(RegisterB.ToString(""));
-            sb.Append(" C: ");
-            sb.Append(RegisterC.ToString(""));
-            sb.Append(" D: ");
-            sb.Append(RegisterD.ToString(""));
-            sb.Append(" E: ");
-            sb.Append(RegisterE.ToString(""));
-            sb.Append(" F: ");
-            sb.Append(RegisterF.ToString(""));
+            sb.Append(registers[(int)RegisterEnum.PC].register);
+
+            for (int i = 0; i < registers.Length-1; i++)
+            {
+                sb.Append(" " + (char)(i+65) + ": ");
+                sb.Append(registers[i].register);
+            }
+
             return sb.ToString();
+
         }
 
-        public void clearRegister(int register)
+        public void clearRegister(RegisterEnum index)
         {
-            switch (register)
-            {
-                case 0:
-                    RegisterA = 0;
-                    break;
-                case 1:
-                    RegisterB = 0;
-                    break;
-                case 2:
-                    RegisterC = 0;
-                    break;
-                case 3:
-                    RegisterD = 0;
-                    break;
-                case 4:
-                    RegisterE = 0;
-                    break;
-                case 5:
-                    RegisterF = 0;
-                    break;
-                case 6:
-                    RegisterPC = 0;
-                    break;
-                default:
-                    throw new ArgumentException("register");
-            }
+            registers[(int)index].register = 0;
+        }
+
+        public void clearRegister(int index)
+        {
+            RegisterEnum e = (RegisterEnum)index;
+            clearRegister(e);
         }
 
         public void clearAllRegisters()
         {
-            RegisterA = 0;
-            RegisterB = 0;
-            RegisterC = 0;
-            RegisterD = 0;
-            RegisterE = 0;
-            RegisterF = 0;
+            foreach (Register r in registers)
+            {
+                r.register = 0;
+            }
         }
 
         public void setMemoryFromRegister(int register, int location)
         {
-            Memory[location] = (int)getRegister(register);
+            Memory.setMemoryAtLocation(location, getRegister(register));
         }
 
         public Int64 getMemoryAtLocation(int location)
         {
-            return Memory[location];
+            return Memory.getMemoryAtLocation(location);
         }
 
         public void setMemoryAtLocation(int location, Int64 data)
         {
-            Memory[location] = data;
+            Memory.setMemoryAtLocation(location, data);
         }
 
         public void clearMemory()
         {
-            Memory.Clear();
+            Memory.clearMemory();
+        }
+
+        public String printMemory()
+        {
+            return printMemory(0);
+        }
+
+        public String printMemory(int location)
+        {
+            return printMemory(location, 16);
+        }
+
+        public String printMemory(int location, int length)
+        {
+            return Memory.printMemory(location, length);
+        }
+
+    }
+    /// <summary>
+    /// Class to internally represent a register
+    /// </summary>
+    class Register
+    {
+        public Int64 register { get; set; }
+
+        public Register()
+        {
+            clearRegister();
+        }
+
+        public void clearRegister()
+        {
+            register = 0;
+        }
+    }
+
+    /// <summary>
+    /// Class that manages the memory of a machine
+    /// </summary>
+
+    class Memory
+    {
+        private List<Int64> MemoryData;
+        public const int MemorySize = 8192;
+
+        public Memory()
+        {
+            MemoryData = new List<Int64>(MemorySize);
+            clearMemory();
+        }
+
+        public Int64 getMemoryAtLocation(int location)
+        {
+            return MemoryData[location];
+        }
+
+        public void setMemoryAtLocation(int location, Int64 data)
+        {
+            MemoryData[location] = data;
+        }
+
+        public void clearMemory()
+        {
+            MemoryData.Clear();
             for (int i = 0; i < MemorySize; i++)
             {
-                Memory.Add((Int64)0);
+                MemoryData.Add((Int64)0);
             }
         }
 
@@ -416,15 +395,14 @@ namespace MutableVM
         {
             StringBuilder sb = new StringBuilder(length * 32);
             String currentMem;
-            for (int i = location; i < length; i++)
+            for (int i = location; i < location + length; i++)
             {
-                currentMem = Memory[i].ToString("0000000000000");
+                currentMem = MemoryData[i].ToString("0000000000000");
                 sb.AppendLine(currentMem);
             }
 
             return sb.ToString();
         }
-
     }
 
 }
