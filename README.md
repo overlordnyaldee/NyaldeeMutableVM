@@ -14,13 +14,13 @@ Commands:
 ---------------------
 
 - none (press enter)
-	Executes the next instruction
+	- Executes the next instruction
 - printmem [location]
-	Displays the memory contents, either at the program counter or at an optional parameter
+	- Displays the memory contents, either at the program counter or at an optional parameter
 - printreg
-	Shows the contents of all registers
+	- Shows the contents of all registers
 - quit
-	Ends the simulation
+	- Ends the simulation
 
 MutableVM Instruction Documentation:
 ---------------------
@@ -91,25 +91,25 @@ Memory Addressable from 0 to 8191 (2^13-1)
 ######Instruction Types:
 
 - 00
-	load
+	- load
 - 01
-	store
+	- store
 - 02
-	add
+	- add
 - 03
-	subtract
+	- subtract
 - 04
-	multiply
+	- multiply
 - 05
-	divide
+	- divide
 - 06
-	rem
+	- rem
 - 07
-	jump
+	- jump
 - 08
-	set register to constant
+	- set register to constant
 - 09
-	no operation
+	- no operation
 
 
 Version History:
