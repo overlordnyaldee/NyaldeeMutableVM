@@ -13,75 +13,70 @@ Compile the application with Visual Studio 2010. To change the running program, 
 MutableVM Instruction Documentation:
 ---------------------
 
-##Registers:
-- A - 0 - General
-- B - 1 - General
-- C - 2 - General
-- D - 3 - General
-- E - 4 - General
-- F - 5 - General
-- PC- 6 - Program Counter
+######Registers:
+- General Purpose
+	- A - 0
+	- B - 1
+	- C - 2
+	- D - 3
+	- E - 4
+	- F - 5
+- Program Counter
+	- PC- 6
 
-##Memory Addressable from 0 to 8191 (2^13-1)
+Memory Addressable from 0 to 8191 (2^13-1)
 
-##Instruction Formats:
+######Instruction Formats:
 
 - Load/Store Format:
 	00 0000 0000 0000
-	|    |    |    |
-	|    |    |    Flags
-	|    |    Memory/Register Address
-	|    Register To Use
-	Instruction Type
 	
-	Flags:
-	0000 - Load/Store data from register from/to memory address
-	0001 - Load/Store data from register from/to register (memory address used as register number)
+	- Instruction Type
+	- Register To Use
+	- Memory/Register Address
+	- Flags
+		- 0000 - Load/Store data from register from/to memory address
+		- 0001 - Load/Store data from register from/to register (memory address used as register number)
 
 
 - Mathematics Format:
 	02 0000 0000 0000
-	|    |    |    |
-	|    |    |    Constant/Flags
-	|    |    Register (that will be copied from, unchanged)
-	|    Register (that will be operated on, result of calculation)
-	Instruction Type
 
+	- Instruction Type
+	- Register (that will be operated on, result of calculation)
+	- Register (that will be copied from, unchanged)
 
 - Jump Format:
 	07 0000 0000 0000
-	|    |    |    |
-	|    |    |    Flags
-	|    |    Memory Address
-	|    Register To Use
-	Instruction Type
-	
-	Flags:
-	0000 - Jump if register is zero
-	0001 - Jump if register is less than zero
-	0002 - Jump if register is greater than zero
-	0003 - Jump always to memory address
+
+	- Instruction Type
+	- Register To Use
+	- Memory/Register Address
+	- Flags
+		- 0000 - Jump if register is zero
+		- 0001 - Jump if register is less than zero
+		- 0002 - Jump if register is greater than zero
+		- 0003 - Jump always to memory address
 
 
 - Set Register to Constant Format:
 	08 0000 00000000
-	|    |    |    
-	|    |    |    
-	|    |    Constant
-	|    Register To Use
-	Instruction Type
+
+	- Instruction Type
+	- Register To Use
+	- Constant
 
 
 - Generic Format:
 	00 0000 0000 0000
-	|    |    |    |
-	|    |    |    Constant/Flags
-	|    |    Memory Address
-	|    Register To Use
-	Instruction Type
+
+	- Instruction Type
+	- Register To Use
+	- Memory/Register Address
+	- Flags/Constant
 
 
-##Instruction Types:
+######Instruction Types:
 
 - 00 = load
 - 01 = store
